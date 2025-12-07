@@ -21,7 +21,6 @@ function App() {
   const [nuevoSerial, setNuevoSerial] = useState('');
 
   // Estados para el formulario de nueva relación
-  // Ahora guardan el ID del equipo y del usuario seleccionado
   const [nuevoUsuarioId, setNuevoUsuarioId] = useState('');
   const [nuevoEquipoId, setNuevoEquipoId] = useState('');
   
@@ -87,7 +86,7 @@ function App() {
       alert("Por favor, selecciona un equipo y un usuario.");
       return;
     }
-
+    
     // 1. Encontrar los datos completos para la nueva relación
     const equipoAsignado = equipos.find(e => e.id === parseInt(nuevoEquipoId));
     const usuarioAsignado = usuarios.find(u => u.id === parseInt(nuevoUsuarioId));
@@ -101,10 +100,9 @@ function App() {
     const nuevoId = relaciones.length > 0 ? Math.max(...relaciones.map(r => r.id)) + 1 : 1;
     const nuevaRelacion = {
       id: nuevoId,
-      // Guardamos la información clave que se usará para mostrar en la tabla
-      equipoSerial: equipoAsignado.serial, // Usamos el serial para la tabla
-      usuarioNombre: usuarioAsignado.nombre, // Usamos el nombre para la tabla
-      equipoId: parseInt(nuevoEquipoId), // Guardamos los IDs para posibles futuras desasignaciones
+      equipoSerial: equipoAsignado.serial,
+      usuarioNombre: usuarioAsignado.nombre,
+      equipoId: parseInt(nuevoEquipoId),
       usuarioId: parseInt(nuevoUsuarioId),
       fecha: fechaAsignacion,
     };
@@ -210,8 +208,6 @@ function App() {
                 </button>
               </div>
             </div>
-
-            {/* Contenedor de la tabla centrado */}
             <table border="1" cellPadding="10" style={{ width: '80%', borderCollapse: 'collapse', margin: '0 auto' }}>
               <thead>
                 <tr>
@@ -234,35 +230,43 @@ function App() {
           </>
         );
       case 'relaciones':
+        // 1. Obtener la lista de IDs de equipos que ya están asignados
+        const equiposAsignadosIds = relaciones.map(r => r.equipoId);
+
+        // 2. Filtrar la lista de equipos originales para obtener solo los disponibles
+        const equiposDisponibles = equipos.filter(equipo => 
+          !equiposAsignadosIds.includes(equipo.id)
+        );
+
         return (
           <>
             {/* Formulario de Asignación */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
               <h3>🔗 Asignar Equipo a Usuario</h3>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                {/* SELECT DE EQUIPOS */}
+                {/* SELECT DE EQUIPOS (FILTRADO) */}
                 <select
                   value={nuevoEquipoId}
                   onChange={(e) => setNuevoEquipoId(e.target.value)}
                   style={{ padding: '8px', border: '1px solid #ccc' }}
                 >
                   <option value="">-- Selecciona un Equipo (Serial) --</option>
-                  {/* Mapea los equipos guardados en el estado */}
-                  {equipos.map((equipo) => (
+                  {/* Mapeamos solo los equipos DISPONIBLES */}
+                  {equiposDisponibles.map((equipo) => (
                     <option key={equipo.id} value={equipo.id}>
                       {`${equipo.tipo} (${equipo.serial})`}
                     </option>
                   ))}
                 </select>
                 
-                {/* SELECT DE USUARIOS */}
+                {/* SELECT DE USUARIOS (NO SE FILTRA, UN USUARIO PUEDE TENER VARIOS EQUIPOS) */}
                 <select
                   value={nuevoUsuarioId}
                   onChange={(e) => setNuevoUsuarioId(e.target.value)}
                   style={{ padding: '8px', border: '1px solid #ccc' }}
                 >
                   <option value="">-- Selecciona un Usuario --</option>
-                  {/* Mapea los usuarios guardados en el estado */}
+                  {/* Mapea todos los usuarios */}
                   {usuarios.map((usuario) => (
                     <option key={usuario.id} value={usuario.id}>
                       {`${usuario.nombre} (${usuario.puesto})`}
@@ -270,7 +274,7 @@ function App() {
                   ))}
                 </select>
                 
-                {/* Campo de fecha (opcional, pero útil) */}
+                {/* Campo de fecha */}
                 <input 
                     type="date"
                     value={fechaAsignacion}
@@ -301,7 +305,6 @@ function App() {
                 {relaciones.map((item) => (
                   <tr key={item.id}>
                     <td>{item.id}</td>
-                    {/* Usamos el serial y nombre guardados en la relación para mejor lectura */}
                     <td>{item.equipoSerial}</td> 
                     <td>{item.usuarioNombre}</td>
                     <td>{item.fecha}</td>
@@ -322,7 +325,7 @@ function App() {
       <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h1>Gestión de Inventario IT</h1>
 
-        {/* BOTONES CENTRADOS */}
+        {/* BOTONES */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '30px' }}>
           <button onClick={() => setVistaActual('equipos')}>
             💻 Ver Equipos ({equipos.length})
@@ -340,7 +343,7 @@ function App() {
           {renderTabla()}
         </div>
 
-        {/* Indicador visual de qué estamos viendo */}
+        {/* Indicador de que tabla estamos viendo */}
         <p style={{ marginTop: '10px', color: '#666' }}>
           Vista actual: <strong>{vistaActual.toUpperCase()}</strong>
         </p>
