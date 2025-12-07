@@ -14,7 +14,12 @@ function App() {
   // Estados para el formulario de nuevo usuario
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoPuesto, setNuevoPuesto] = useState('');
-  
+
+  // Estados para el formulario de nuevo equipo
+  const [nuevoTipo, setNuevoTipo] = useState('');
+  const [nuevaMarca, setNuevaMarca] = useState('');
+  const [nuevoSerial, setNuevoSerial] = useState('');
+
   // Controla qué tabla estamos viendo
   const [vistaActual, setVistaActual] = useState('equipos');
 
@@ -24,46 +29,103 @@ function App() {
       alert("Por favor, introduce un nombre y selecciona un puesto.");
       return;
     }
-    
+
     const nuevoId = Math.max(...usuarios.map(u => u.id), 0) + 1; // Generar nuevo ID
-    const nuevoUsuario = { 
-      id: nuevoId, 
-      nombre: nuevoNombre, 
-      puesto: nuevoPuesto 
+    const nuevoUsuario = {
+      id: nuevoId,
+      nombre: nuevoNombre,
+      puesto: nuevoPuesto
     };
 
     setUsuarios([...usuarios, nuevoUsuario]);
-    
+
     // Limpiar el formulario
     setNuevoNombre('');
     setNuevoPuesto('');
   };
+
+  // Lógica para agregar un nuevo equipo
+  const handleAgregarEquipo = () => {
+    if (!nuevoTipo.trim() || !nuevaMarca.trim() || !nuevoSerial.trim()) {
+      alert("Por favor, completa todos los campos del equipo.");
+      return;
+    }
+
+    const nuevoId = Math.max(...equipos.map(e => e.id), 0) + 1; // Generar nuevo ID
+    const nuevoEquipo = {
+      id: nuevoId,
+      tipo: nuevoTipo,
+      marca: nuevaMarca,
+      serial: nuevoSerial
+    };
+
+    setEquipos([...equipos, nuevoEquipo]);
+
+    // Limpiar el formulario
+    setNuevoTipo('');
+    setNuevaMarca('');
+    setNuevoSerial('');
+  }
 
   // 3. Para renderizar la tabla según la vista actual 
   const renderTabla = () => {
     switch (vistaActual) {
       case 'equipos':
         return (
-          <table border="1" cellPadding="10" style={{ width: '80%', borderCollapse: 'collapse', margin: '0 auto' }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tipo</th>
-                <th>Marca</th>
-                <th>Serial</th>
-              </tr>
-            </thead>
-            <tbody>
-              {equipos.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>{item.tipo}</td>
-                  <td>{item.marca}</td>
-                  <td>{item.serial}</td>
+          <>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+              <h3>➕ Agregar Nuevo Equipo</h3>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Tipo de equipo"
+                  value={nuevoTipo}
+                  onChange={(e) => setNuevoTipo(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #ccc' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Marca"
+                  value={nuevaMarca}
+                  onChange={(e) => setNuevaMarca(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #ccc' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Serial"
+                  value={nuevoSerial}
+                  onChange={(e) => setNuevoSerial(e.target.value)}
+                  style={{ padding: '8px', border: '1px solid #ccc' }}
+                />
+                <button
+                  onClick={handleAgregarEquipo}
+                  style={{ padding: '8px 15px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
+                >
+                  Agregar
+                </button>
+              </div>
+            </div>
+            <table border="1" cellPadding="10" style={{ width: '80%', borderCollapse: 'collapse', margin: '0 auto' }}>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Marca</th>
+                  <th>Serial</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {equipos.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.id}</td>
+                    <td>{item.tipo}</td>
+                    <td>{item.marca}</td>
+                    <td>{item.serial}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         );
       case 'usuarios':
         return (
@@ -90,7 +152,7 @@ function App() {
                     </option>
                   ))}
                 </select>
-                <button 
+                <button
                   onClick={handleAgregarUsuario}
                   style={{ padding: '8px 15px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}
                 >
